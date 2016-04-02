@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MyController">
+  <tabs>
+    <Tab text="Connect to database">
+         <content>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="loadData" alignment="CENTER" contentDisplay="TOP" layoutX="227.0" layoutY="279.0" mnemonicParsing="false" onAction="#handleButtonAction" text="Connect to database" />
+                  <Label fx:id="label" alignment="CENTER" layoutX="220.0" layoutY="251.0" prefHeight="17.0" prefWidth="159.0" text="not connected" />
+                  <TextField fx:id="dbIP" layoutX="137.0" layoutY="36.0" text="192.168.0.23" />
+                  <TextField fx:id="dbName" layoutX="137.0" layoutY="74.0" text="schokofabrik" />
+                  <TextField fx:id="dbUser" layoutX="137.0" layoutY="118.0" text="schokouser" />
+                  <Label layoutX="20.0" layoutY="41.0" prefHeight="17.0" prefWidth="102.0" text="IP-Address:" />
+                  <Label layoutX="20.0" layoutY="79.0" prefHeight="17.0" prefWidth="102.0" text="Database name:" />
+                  <Label layoutX="20.0" layoutY="123.0" prefHeight="17.0" prefWidth="102.0" text="Database user:" />
+                  <Label layoutX="20.0" layoutY="162.0" prefHeight="17.0" prefWidth="102.0" text="User password:" />
+                  <PasswordField fx:id="dbPass" layoutX="137.0" layoutY="157.0" />
+                  <ProgressIndicator fx:id="progress" layoutX="432.0" layoutY="95.0" progress="0.0" />
+               </children>
+            </Pane>
+         </content></Tab>
+    <Tab fx:id="gamerTableTab" disable="true" text="Output">
+         <content>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="14.0" layoutY="14.0" prefHeight="17.0" prefWidth="318.0" text="Database output:" />
+                  <TableView fx:id="gamerTableView" editable="true" layoutX="14.0" layoutY="44.0" prefHeight="299.0" prefWidth="572.0" />
+               </children>
+            </Pane>
+         </content></Tab>
+      <Tab fx:id="updateTableTab" disable="true" text="Update">
+         <content>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <TextArea editable="false" layoutX="14.0" layoutY="14.0" prefHeight="51.0" prefWidth="573.0" text="To update content from the &quot;Output&quot; Tab, enter the identifing number (shown in the &#10;Output's table) and hit enter." />
+                  <TextField fx:id="inputNumber" layoutX="217.0" layoutY="99.0" onAction="#updateButton" />
+                  <Label alignment="CENTER" layoutX="225.0" layoutY="76.0" prefHeight="17.0" prefWidth="152.0" text="enter number" />
+                  <TableView fx:id="updateTableView" layoutX="20.0" layoutY="155.0" prefHeight="70.0" prefWidth="562.0" />
+               </children>
+            </Pane>
+         </content>
+      </Tab>
+  </tabs>
+</TabPane>
