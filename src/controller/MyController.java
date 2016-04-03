@@ -33,11 +33,9 @@ public class MyController implements Initializable {
 	@FXML
 	private Button loadData, chooseButton, updateButton, disconnect;
 	@FXML
-	private ComboBox comboBox;
-	@FXML
 	private ProgressIndicator progress;
 	@FXML
-	private Tab gamerTableTab, updateTableTab, insertTableTab;
+	private Tab gamerTableTab, insertTableTab;
 	@FXML
 	private TableView gamerTableView, updateTableView;
 	@FXML
@@ -74,7 +72,6 @@ public class MyController implements Initializable {
 			label.setText("connected!");
 			System.out.println("successfully connected!");
 			gamerTableTab.setDisable(false);
-			updateTableTab.setDisable(false);
 			insertTableTab.setDisable(false);
 			progress.setProgress(100);
 			
@@ -104,7 +101,6 @@ public class MyController implements Initializable {
                 data.add(row);
 			}
 			
-			comboBox.setItems(data);
 			gamerTableView.setItems(data);
 			
 			loadData.setDisable(true);
@@ -122,27 +118,6 @@ public class MyController implements Initializable {
 	}
 	
 	@FXML
-	public void chooseButton(ActionEvent event) throws ArrayIndexOutOfBoundsException{
-
-		String input = comboBox.getValue()+"";
-		
-		input = input.substring(1,input.length()-1);
-		
-		inarr = input.split(", ");
-		
-		updateButton.setDisable(false);
-		
-		nummerTF.setText(inarr[0]);
-		bezeichnungTF.setText(inarr[1]);
-		gewichtTF.setText(inarr[2]);
-		
-		bezeichnungTF.setDisable(false);
-		gewichtTF.setDisable(false);
-			
-	}
-	
-	
-	@FXML
 	public void updateClicked(ActionEvent event){
 		
 		try{
@@ -152,6 +127,8 @@ public class MyController implements Initializable {
 			st.executeUpdate("UPDATE produkt SET bezeichnung=\'"+bezeichnungTF.getText()+"\', gewicht=\'"+gewichtTF.getText()+"\' WHERE nummer=\'"+inarr[0]+"\'");
 			
 			System.out.println("Update successful");
+			
+			updateTableClicked(null);
 			
 		} catch (SQLException se){
 			System.err.println("Update Error");
@@ -181,7 +158,6 @@ public class MyController implements Initializable {
 			
 			label.setText("not connected");
 			gamerTableTab.setDisable(true);
-			updateTableTab.setDisable(true);
 			insertTableTab.setDisable(true);
 			progress.setProgress(0);
 			loadData.setDisable(false);
@@ -237,6 +213,6 @@ public class MyController implements Initializable {
 		
 		bezeichnungTF.setDisable(false);
 		gewichtTF.setDisable(false);
-		
+
 	}
 }
