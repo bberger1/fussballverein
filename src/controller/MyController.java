@@ -44,10 +44,10 @@ public class MyController implements Initializable {
 	@FXML
 	private TextField nummerTFI, bezeichnungTFI, gewichtTFI;
 	
-	private PGSimpleDataSource ds;
+	private PGSimpleDataSource dataSource;
 	private String[] inarr;
-	private Connection con;
-	private Statement st;
+	private Connection connection;
+	private Statement statement;
 	
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -57,17 +57,17 @@ public class MyController implements Initializable {
 		data = FXCollections.observableArrayList();
 		
 		// Datenquelle erzeugen und konfigurieren
-		ds = new PGSimpleDataSource();
-		ds.setServerName(dbIP.getText());
-		ds.setDatabaseName(dbName.getText());
-		ds.setUser(dbUser.getText());
-		ds.setPassword(dbPass.getText());
+		dataSource = new PGSimpleDataSource();
+		dataSource.setServerName(dbIP.getText());
+		dataSource.setDatabaseName(dbName.getText());
+		dataSource.setUser(dbUser.getText());
+		dataSource.setPassword(dbPass.getText());
 		// Verbindung herstellen
 		try{
-			con = ds.getConnection();
+			connection = dataSource.getConnection();
 			// Abfrage vorbereiten und ausführen
-			st = con.createStatement();
-			ResultSet rs = st.executeQuery("select * from produkt");
+			statement = connection.createStatement();
+			ResultSet rs = statement.executeQuery("select * from produkt");
 			
 
 			label.setText("connected!");
@@ -119,21 +119,29 @@ public class MyController implements Initializable {
 	}
 	
 	@FXML
-	public void updateClicked(ActionEvent event){
+	public void updateClicked(ActionEvent event) throws SQLException{
 		
 		try{
-			Connection con = ds.getConnection();
-			// Abfrage vorbereiten und ausführen
-			Statement st = con.createStatement();
-			st.executeUpdate("UPDATE produkt SET bezeichnung=\'"+bezeichnungTF.getText()+"\', gewicht=\'"+gewichtTF.getText()+"\' WHERE nummer=\'"+inarr[0]+"\'");
+			Statement statement = connection.createStatement();
+			
+			connection.setAutoCommit(false);
+			
+			statement.executeUpdate("UPDATE produkt SET bezeichnung=\'"+bezeichnungTF.getText()+"\', gewicht=\'"+gewichtTF.getText()+"\' WHERE nummer=\'"+inarr[0]+"\'");
+			
+			connection.commit();
 			
 			System.out.println("Update successful");
 			
 			updateTableClicked(null);
 			
 		} catch (SQLException se){
+			connection.rollback();
 			System.err.println("Update Error");
 			se.printStackTrace(System.err);
+		} finally {
+			if (statement != null) {
+				statement.close();
+			}
 		}
 		
 	}
@@ -146,7 +154,6 @@ public class MyController implements Initializable {
 		data.clear();
 		data = FXCollections.observableArrayList();
 		
-		
 		handleButtonAction(null);
 		
 	}
@@ -155,7 +162,7 @@ public class MyController implements Initializable {
 	public void disconnectPressed(ActionEvent event){
 		
 		try {
-			con.close();
+			connection.close();
 			
 			label.setText("not connected");
 			gamerTableTab.setDisable(true);
@@ -175,7 +182,7 @@ public class MyController implements Initializable {
 	}
 	
 	@FXML
-	public void insertClicked(ActionEvent event){
+	public void insertClicked(ActionEvent event) throws SQLException{
 		
 		if(nummerTFI.getText().matches("^-?\\d+$") && gewichtTFI.getText().matches("^-?\\d+$")){
 			
@@ -184,14 +191,25 @@ public class MyController implements Initializable {
 			String bez = bezeichnungTFI.getText();
 			
 			try {
-				st.executeUpdate("INSERT INTO produkt VALUES ("+ num +", '"+ bez +"', '"+ gew +"')");
+				
+				connection.setAutoCommit(false);
+				statement.executeUpdate("INSERT INTO produkt VALUES ("+ num +", '"+ bez +"', '"+ gew +"')");
+				connection.commit();
 				
 				System.out.println("Insert successful!");
 				insertLabel.setText("Insert successful");
+				
 			} catch (SQLException e) {
+				
+				connection.close();
 				insertLabel.setText("Insert error!");
 				System.err.println("Insert error!");
 				e.printStackTrace();
+				
+			} finally {
+				if (statement != null) {
+					statement.close();
+				}
 			}
 			
 		} else {
