@@ -36,6 +36,7 @@ public class MyController implements Initializable {
 	private ProgressIndicator progress;
 	@FXML
 	private Tab gamerTableTab, insertTableTab;
+	@SuppressWarnings("rawtypes")
 	@FXML
 	private TableView gamerTableView, updateTableView;
 	@FXML
@@ -177,25 +178,32 @@ public class MyController implements Initializable {
 	public void insertClicked(ActionEvent event){
 		
 		if(nummerTFI.getText().matches("^-?\\d+$") && gewichtTFI.getText().matches("^-?\\d+$")){
-			insertLabel.setText("insert successful");
+			
+			int num = Integer.parseInt(nummerTFI.getText());
+			int gew = Integer.parseInt(gewichtTFI.getText());
+			String bez = bezeichnungTFI.getText();
+			
+			try {
+				st.executeUpdate("INSERT INTO produkt VALUES ("+ num +", '"+ bez +"', '"+ gew +"')");
+				
+				System.out.println("Insert successful!");
+				insertLabel.setText("Insert successful");
+			} catch (SQLException e) {
+				insertLabel.setText("Insert error!");
+				System.err.println("Insert error!");
+				e.printStackTrace();
+			}
 			
 		} else {
 			insertLabel.setText("ERROR: check your input! nummer and gewicht have to be integer!");
 		}
-		
-		/*
-		 try {
-			st.executeUpdate("INSERT INTO produkt VALUES (102, 'Zaid', 'Khan')");
-		} catch (SQLException e) {
-			System.err.println("Insert error!");
-			e.printStackTrace();
-		}*/
 		
 	}
 	
 	@FXML
 	public void onMouseClicked(MouseEvent event){
 		
+		@SuppressWarnings("rawtypes")
 		TablePosition focusedCell = gamerTableView.getFocusModel().getFocusedCell();
         int row = focusedCell.getRow();
 		
