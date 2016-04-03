@@ -165,7 +165,17 @@ public class MyController implements Initializable {
 			progress.setProgress(0);
 			loadData.setDisable(false);
 			disconnect.setDisable(true);
-
+			
+			nummerTF.setText("");
+			bezeichnungTF.setText("");
+			gewichtTF.setText("");
+			
+			nummerTFI.setText("");
+			bezeichnungTFI.setText("");
+			gewichtTFI.setText("");
+			
+			updateButton.setDisable(true);
+			
 			System.out.println("Disconnected");
 
 		} catch (SQLException e) {
