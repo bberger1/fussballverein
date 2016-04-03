@@ -122,7 +122,7 @@ public class MyController implements Initializable {
 	}
 	
 	@FXML
-	public void chooseButton(ActionEvent event){
+	public void chooseButton(ActionEvent event) throws ArrayIndexOutOfBoundsException{
 
 		String input = comboBox.getValue()+"";
 		
@@ -220,17 +220,10 @@ public class MyController implements Initializable {
 	@FXML
 	public void onMouseClicked(MouseEvent event){
 		
-		System.err.println("apwodapowjd "+event.getPickResult());
+		TablePosition focusedCell = gamerTableView.getFocusModel().getFocusedCell();
+        int row = focusedCell.getRow();
 		
-		
-		Object object =  gamerTableView.getSelectionModel().selectedItemProperty().get();
-		ObservableList<ObservableList> select = gamerTableView.getSelectionModel().getSelectedCells();
-		
-		System.err.println(gamerTableView.getSelectionModel().toString());
-		
-		
-		/*
-		String input = comboBox.getValue()+"";
+		String input = data.get(row)+"";
 		
 		input = input.substring(1,input.length()-1);
 		
@@ -243,7 +236,7 @@ public class MyController implements Initializable {
 		gewichtTF.setText(inarr[2]);
 		
 		bezeichnungTF.setDisable(false);
-		gewichtTF.setDisable(false);*/
+		gewichtTF.setDisable(false);
 		
 	}
 }
