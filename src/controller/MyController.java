@@ -20,13 +20,12 @@ import javafx.scene.input.MouseEvent;
 
 public class MyController implements Initializable {
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		// not much to do here...
-	}
-
 	@SuppressWarnings("rawtypes")
 	private ObservableList<ObservableList> data;
+	private PGSimpleDataSource dataSource;
+	private String[] inarr;
+	private Connection connection;
+	private Statement statement;
 
 	@FXML
 	private Label label, insertLabel;
@@ -43,11 +42,6 @@ public class MyController implements Initializable {
 	private TextField dbIP, dbName, dbUser, dbPass, inputNumber, nummerTF, bezeichnungTF, gewichtTF;
 	@FXML
 	private TextField nummerTFI, bezeichnungTFI, gewichtTFI;
-
-	private PGSimpleDataSource dataSource;
-	private String[] inarr;
-	private Connection connection;
-	private Statement statement;
 
 	/**
 	 * handleButtonAction
@@ -86,6 +80,12 @@ public class MyController implements Initializable {
 			gamerTableTab.setDisable(false);
 			insertTableTab.setDisable(false);
 			progress.setProgress(100);
+			
+			// clear all columns in the tableView
+			gamerTableView.getColumns().clear();
+
+			data.clear();
+			data = FXCollections.observableArrayList();
 
 			// this algorithm detects the number of columns
 			for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
@@ -315,5 +315,14 @@ public class MyController implements Initializable {
 		bezeichnungTF.setDisable(false);
 		gewichtTF.setDisable(false);
 
+	}
+	
+	/**
+	 * initialize 
+	 * necessary method of Initializable
+	 */
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		// not much to do here...
 	}
 }
