@@ -3,9 +3,7 @@ package controller;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
-
 import org.postgresql.ds.PGSimpleDataSource;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -16,66 +14,68 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.util.Callback;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
 
 public class MyController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		// TODO Auto-generated method stub
-		
+		// not much to do here...
 	}
 	
 	@SuppressWarnings("rawtypes")
 	private ObservableList<ObservableList> data;
 	
 	@FXML
-	private Label label;
+	private Label label, insertLabel;
 	@FXML
-	private Button loadData;
+	private Button loadData, chooseButton, updateButton, disconnect;
+	@FXML
+	private ComboBox comboBox;
 	@FXML
 	private ProgressIndicator progress;
 	@FXML
-	private Tab gamerTableTab, updateTableTab;
+	private Tab gamerTableTab, updateTableTab, insertTableTab;
 	@FXML
 	private TableView gamerTableView, updateTableView;
 	@FXML
-	private TextField dbIP, dbName, dbUser, dbPass, inputNumber;
+	private TextField dbIP, dbName, dbUser, dbPass, inputNumber, nummerTF, bezeichnungTF, gewichtTF;
+	@FXML
+	private TextField nummerTFI, bezeichnungTFI, gewichtTFI;
 	
 	private PGSimpleDataSource ds;
+	private String[] inarr;
+	private Connection con;
+	private Statement st;
 	
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void handleButtonAction(ActionEvent event){
-		System.err.println("Connecting to database...");
+		System.out.println("Connecting to database...");
 		
 		data = FXCollections.observableArrayList();
 		
 		// Datenquelle erzeugen und konfigurieren
 		ds = new PGSimpleDataSource();
-		/*ds.setServerName("192.168.0.23");
-		ds.setDatabaseName("schokofabrik");
-		ds.setUser("schokouser");
-		ds.setPassword("schokoUser");*/
 		ds.setServerName(dbIP.getText());
 		ds.setDatabaseName(dbName.getText());
 		ds.setUser(dbUser.getText());
 		ds.setPassword(dbPass.getText());
 		// Verbindung herstellen
-		try(
-			Connection con = ds.getConnection();
+		try{
+			con = ds.getConnection();
 			// Abfrage vorbereiten und ausführen
-			Statement st = con.createStatement();
+			st = con.createStatement();
 			ResultSet rs = st.executeQuery("select * from produkt");
-			){
 			
+
 			label.setText("connected!");
+			System.out.println("successfully connected!");
 			gamerTableTab.setDisable(false);
 			updateTableTab.setDisable(false);
+			insertTableTab.setDisable(false);
 			progress.setProgress(100);
 			
 			
@@ -90,11 +90,8 @@ public class MyController implements Initializable {
                     }                    
                 });
 
-                gamerTableView.getColumns().addAll(col); 
-                System.out.println("Column ["+i+"] ");
+                gamerTableView.getColumns().addAll(col);
             }
-			
-			
 			
 			// Ergebnisse verarbeiten
 			while (rs.next()) { // Cursor bewegen
@@ -102,89 +99,151 @@ public class MyController implements Initializable {
                 for(int i=1 ; i<=rs.getMetaData().getColumnCount(); i++){
                     //Iterate Column
                     row.add(rs.getString(i));
+                    
                 }
-                System.out.println("Row [1] added "+row );
                 data.add(row);
 			}
 			
-			//adding data to tableView
+			comboBox.setItems(data);
 			gamerTableView.setItems(data);
 			
-		}catch (SQLException se){
+			loadData.setDisable(true);
+			disconnect.setDisable(false);
+			
+		} catch (org.postgresql.util.PSQLException e){
+			System.err.println("Error");
+			label.setText("Error");
+			e.printStackTrace(System.err);
+		} catch (SQLException se){
 			System.err.println("Error");
 			label.setText("Error");
 			se.printStackTrace(System.err);
-		}
+		} 
 	}
 	
 	@FXML
-	public void updateButton(ActionEvent event){
+	public void chooseButton(ActionEvent event){
+
+		String input = comboBox.getValue()+"";
 		
-		String input = inputNumber.getText();
+		input = input.substring(1,input.length()-1);
 		
-		if(CheckString(input)){
-			updateRow(Integer.parseInt(input));
+		inarr = input.split(", ");
+		
+		updateButton.setDisable(false);
+		
+		nummerTF.setText(inarr[0]);
+		bezeichnungTF.setText(inarr[1]);
+		gewichtTF.setText(inarr[2]);
+		
+		bezeichnungTF.setDisable(false);
+		gewichtTF.setDisable(false);
 			
-		} else {
-			inputNumber.setText("Enter number!");
-		}
-		
 	}
 	
-	private void updateRow(int index){
-		data = null;
-		data = FXCollections.observableArrayList();
+	
+	@FXML
+	public void updateClicked(ActionEvent event){
 		
-		try(
+		try{
 			Connection con = ds.getConnection();
 			// Abfrage vorbereiten und ausführen
 			Statement st = con.createStatement();
-			ResultSet rs = st.executeQuery("select * from produkt where nummer="+index);
-			){
+			st.executeUpdate("UPDATE produkt SET bezeichnung=\'"+bezeichnungTF.getText()+"\', gewicht=\'"+gewichtTF.getText()+"\' WHERE nummer=\'"+inarr[0]+"\'");
 			
+			System.out.println("Update successful");
 			
-			for(int i=0 ; i<rs.getMetaData().getColumnCount(); i++){
-                //We are using non property style for making dynamic table
-                final int j = i;
-				TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i+1));
-                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){                    
-                    public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {                                                                                              
-                        return new SimpleStringProperty(param.getValue().get(j).toString());                        
-                    }                    
-                });
-
-                updateTableView.getColumns().addAll(col); 
-                System.out.println("Column ["+i+"] ");
-            }
-			
-			
-			
-			// Ergebnisse verarbeiten
-			while (rs.next()) { // Cursor bewegen
-				ObservableList<String> row = FXCollections.observableArrayList();
-                for(int i=1 ; i<=rs.getMetaData().getColumnCount(); i++){
-                    //Iterate Column
-                    row.add(rs.getString(i));
-                }
-                System.out.println("Row [1] added "+row );
-                data.add(row);
-			}
-			
-			//adding data to tableView
-			updateTableView.setItems(data);
-			
-		}catch (SQLException se){
-			System.err.println("Error");
-			label.setText("Error");
+		} catch (SQLException se){
+			System.err.println("Update Error");
 			se.printStackTrace(System.err);
 		}
+		
 	}
 	
-	public static boolean CheckString(String str) {
-	    for (char c : str.toCharArray()) {
-	        if (!Character.isDigit(c))
-	            return false;
-	    }
-	    return true;
+	@FXML
+	public void updateTableClicked(ActionEvent event){
+		
+		gamerTableView.getColumns().clear();
+		
+		data.clear();
+		data = FXCollections.observableArrayList();
+		
+		
+		handleButtonAction(null);
+		
+	}
+	
+	@FXML
+	public void disconnectPressed(ActionEvent event){
+		
+		try {
+			con.close();
+			
+			label.setText("not connected");
+			gamerTableTab.setDisable(true);
+			updateTableTab.setDisable(true);
+			insertTableTab.setDisable(true);
+			progress.setProgress(0);
+			loadData.setDisable(false);
+			disconnect.setDisable(true);
+			
+			System.out.println("Disconnected");
+			
+		} catch (SQLException e) {
+			System.err.println("Connection could not be closed!");
+			label.setText("Error");
+			e.printStackTrace();
+		}
+		
+	}
+	
+	@FXML
+	public void insertClicked(ActionEvent event){
+		
+		if(nummerTFI.getText().matches("^-?\\d+$") && gewichtTFI.getText().matches("^-?\\d+$")){
+			insertLabel.setText("insert successful");
+			
+		} else {
+			insertLabel.setText("ERROR: check your input! nummer and gewicht have to be integer!");
+		}
+		
+		/*
+		 try {
+			st.executeUpdate("INSERT INTO produkt VALUES (102, 'Zaid', 'Khan')");
+		} catch (SQLException e) {
+			System.err.println("Insert error!");
+			e.printStackTrace();
+		}*/
+		
+	}
+	
+	@FXML
+	public void onMouseClicked(MouseEvent event){
+		
+		System.err.println("apwodapowjd "+event.getPickResult());
+		
+		
+		Object object =  gamerTableView.getSelectionModel().selectedItemProperty().get();
+		ObservableList<ObservableList> select = gamerTableView.getSelectionModel().getSelectedCells();
+		
+		System.err.println(gamerTableView.getSelectionModel().toString());
+		
+		
+		/*
+		String input = comboBox.getValue()+"";
+		
+		input = input.substring(1,input.length()-1);
+		
+		inarr = input.split(", ");
+		
+		updateButton.setDisable(false);
+		
+		nummerTF.setText(inarr[0]);
+		bezeichnungTF.setText(inarr[1]);
+		gewichtTF.setText(inarr[2]);
+		
+		bezeichnungTF.setDisable(false);
+		gewichtTF.setDisable(false);*/
+		
 	}
 }

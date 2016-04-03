@@ -13,17 +13,23 @@
          <content>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="loadData" alignment="CENTER" contentDisplay="TOP" layoutX="227.0" layoutY="279.0" mnemonicParsing="false" onAction="#handleButtonAction" text="Connect to database" />
-                  <Label fx:id="label" alignment="CENTER" layoutX="220.0" layoutY="251.0" prefHeight="17.0" prefWidth="159.0" text="not connected" />
-                  <TextField fx:id="dbIP" layoutX="137.0" layoutY="36.0" text="192.168.0.23" />
-                  <TextField fx:id="dbName" layoutX="137.0" layoutY="74.0" text="schokofabrik" />
-                  <TextField fx:id="dbUser" layoutX="137.0" layoutY="118.0" text="schokouser" />
-                  <Label layoutX="20.0" layoutY="41.0" prefHeight="17.0" prefWidth="102.0" text="IP-Address:" />
-                  <Label layoutX="20.0" layoutY="79.0" prefHeight="17.0" prefWidth="102.0" text="Database name:" />
-                  <Label layoutX="20.0" layoutY="123.0" prefHeight="17.0" prefWidth="102.0" text="Database user:" />
-                  <Label layoutX="20.0" layoutY="162.0" prefHeight="17.0" prefWidth="102.0" text="User password:" />
-                  <PasswordField fx:id="dbPass" layoutX="137.0" layoutY="157.0" />
-                  <ProgressIndicator fx:id="progress" layoutX="432.0" layoutY="95.0" progress="0.0" />
+                  <Button fx:id="loadData" alignment="CENTER" contentDisplay="TOP" layoutX="179.0" layoutY="300.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="27.0" prefWidth="107.0" text="Connect" />
+                  <Label fx:id="label" alignment="CENTER" layoutX="221.0" layoutY="272.0" prefHeight="17.0" prefWidth="159.0" text="not connected" />
+                  <TextField fx:id="dbIP" layoutX="137.0" layoutY="94.0" text="192.168.0.23" />
+                  <TextField fx:id="dbName" layoutX="137.0" layoutY="132.0" text="schokofabrik" />
+                  <TextField fx:id="dbUser" layoutX="137.0" layoutY="176.0" text="schokouser" />
+                  <Label layoutX="20.0" layoutY="99.0" prefHeight="17.0" prefWidth="102.0" text="IP-Address:" />
+                  <Label layoutX="20.0" layoutY="137.0" prefHeight="17.0" prefWidth="102.0" text="Database name:" />
+                  <Label layoutX="20.0" layoutY="181.0" prefHeight="17.0" prefWidth="102.0" text="Database user:" />
+                  <Label layoutX="20.0" layoutY="220.0" prefHeight="17.0" prefWidth="102.0" text="User password:" />
+                  <PasswordField fx:id="dbPass" layoutX="137.0" layoutY="215.0" text="schokoUser" />
+                  <ProgressIndicator fx:id="progress" layoutX="432.0" layoutY="153.0" progress="0.0" />
+                  <Label alignment="CENTER" layoutX="162.0" layoutY="31.0" prefHeight="28.0" prefWidth="277.0" text="&quot;Schokofabrik&quot; Reader">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="disconnect" alignment="CENTER" contentDisplay="TOP" disable="true" layoutX="314.0" layoutY="300.0" mnemonicParsing="false" onAction="#disconnectPressed" prefHeight="27.0" prefWidth="107.0" text="Disconnect" />
                </children>
             </Pane>
          </content></Tab>
@@ -32,7 +38,12 @@
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
                   <Label layoutX="14.0" layoutY="14.0" prefHeight="17.0" prefWidth="318.0" text="Database output:" />
-                  <TableView fx:id="gamerTableView" editable="true" layoutX="14.0" layoutY="44.0" prefHeight="299.0" prefWidth="572.0" />
+                  <TableView fx:id="gamerTableView" editable="true" layoutX="14.0" layoutY="44.0" onMouseClicked="#onMouseClicked" prefHeight="258.0" prefWidth="572.0" />
+                  <TextField fx:id="nummerTF" disable="true" layoutX="14.0" layoutY="326.0" prefHeight="27.0" prefWidth="67.0" text="nummer" />
+                  <TextField fx:id="bezeichnungTF" disable="true" layoutX="81.0" layoutY="326.0" prefHeight="27.0" prefWidth="314.0" text="bezeichnung" />
+                  <TextField fx:id="gewichtTF" disable="true" layoutX="395.0" layoutY="326.0" prefHeight="27.0" prefWidth="68.0" text="gewicht" />
+                  <Button fx:id="updateButton" disable="true" layoutX="481.0" layoutY="326.0" mnemonicParsing="false" onAction="#updateClicked" prefHeight="27.0" prefWidth="105.0" text="Update" />
+                  <Button fx:id="updateTable" layoutX="523.0" layoutY="9.0" mnemonicParsing="false" onAction="#updateTableClicked" text="Update" />
                </children>
             </Pane>
          </content></Tab>
@@ -40,10 +51,27 @@
          <content>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <TextArea editable="false" layoutX="14.0" layoutY="14.0" prefHeight="51.0" prefWidth="573.0" text="To update content from the &quot;Output&quot; Tab, enter the identifing number (shown in the &#10;Output's table) and hit enter." />
-                  <TextField fx:id="inputNumber" layoutX="217.0" layoutY="99.0" onAction="#updateButton" />
-                  <Label alignment="CENTER" layoutX="225.0" layoutY="76.0" prefHeight="17.0" prefWidth="152.0" text="enter number" />
-                  <TableView fx:id="updateTableView" layoutX="20.0" layoutY="155.0" prefHeight="70.0" prefWidth="562.0" />
+                  <TextArea editable="false" layoutX="14.0" layoutY="14.0" prefHeight="61.0" prefWidth="573.0" text="To update content from the &quot;Output&quot; Tab, choose the wanted element. The textfields &#10;below will be filled with the current content of the chosen element. Now the values can &#10;be changed by editing the textfields and confirm it by hitting the button &quot;update&quot;." />
+                  <ComboBox fx:id="comboBox" layoutX="14.0" layoutY="109.0" onAction="#chooseButton" prefHeight="27.0" prefWidth="573.0" promptText="choose element..." />
+                  <Label layoutX="19.0" layoutY="190.0" prefHeight="17.0" prefWidth="71.0" text="nummer:" />
+                  <Label layoutX="99.0" layoutY="190.0" prefHeight="17.0" prefWidth="311.0" text="bezeichnung:" />
+                  <Label layoutX="419.0" layoutY="190.0" prefHeight="17.0" prefWidth="100.0" text="gewicht:" />
+               </children>
+            </Pane>
+         </content>
+      </Tab>
+      <Tab fx:id="insertTableTab" disable="true" text="Insert">
+         <content>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <TextField fx:id="nummerTFI" layoutX="17.0" layoutY="103.0" prefHeight="27.0" prefWidth="73.0" promptText="nummer" />
+                  <TextField fx:id="bezeichnungTFI" layoutX="97.0" layoutY="103.0" prefHeight="27.0" prefWidth="314.0" promptText="bezeichnung" />
+                  <TextField fx:id="gewichtTFI" layoutX="417.0" layoutY="103.0" promptText="gewicht" />
+                  <Label layoutX="17.0" layoutY="79.0" prefHeight="17.0" prefWidth="71.0" text="nummer:" />
+                  <Label layoutX="97.0" layoutY="79.0" prefHeight="17.0" prefWidth="311.0" text="bezeichnung:" />
+                  <Label layoutX="417.0" layoutY="79.0" prefHeight="17.0" prefWidth="100.0" text="gewicht:" />
+                  <Button fx:id="insertButton" layoutX="248.0" layoutY="233.0" mnemonicParsing="false" onAction="#insertClicked" prefHeight="27.0" prefWidth="105.0" text="Insert" />
+                  <Label fx:id="insertLabel" alignment="CENTER" layoutX="13.0" layoutY="206.0" prefHeight="17.0" prefWidth="575.0" text="enter values" />
                </children>
             </Pane>
          </content>
