@@ -38,12 +38,21 @@
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
                   <Label layoutX="14.0" layoutY="14.0" prefHeight="17.0" prefWidth="318.0" text="Database output:" />
-                  <TableView fx:id="gamerTableView" editable="true" layoutX="14.0" layoutY="44.0" onMouseClicked="#onMouseClicked" prefHeight="271.0" prefWidth="572.0" />
+                  <TableView fx:id="gamerTableView" editable="true" layoutX="14.0" layoutY="44.0" onMouseClicked="#onMouseClicked" prefHeight="264.0" prefWidth="572.0" />
                   <Button fx:id="updateTable" layoutX="523.0" layoutY="9.0" mnemonicParsing="false" onAction="#updateTableClicked" text="Update" />
                   <TextField fx:id="nummerTF" disable="true" layoutX="14.0" layoutY="326.0" prefHeight="27.0" prefWidth="67.0" text="nummer" />
                   <TextField fx:id="bezeichnungTF" disable="true" layoutX="81.0" layoutY="326.0" prefHeight="27.0" prefWidth="314.0" text="bezeichnung" />
                   <TextField fx:id="gewichtTF" disable="true" layoutX="395.0" layoutY="326.0" prefHeight="27.0" prefWidth="68.0" text="gewicht" />
-                  <Button fx:id="updateButton" disable="true" layoutX="481.0" layoutY="326.0" mnemonicParsing="false" onAction="#updateClicked" prefHeight="27.0" prefWidth="105.0" text="Update" />
+                  <Button fx:id="deleteButton" layoutX="481.0" layoutY="316.0" mnemonicParsing="false" onAction="#deleteClicked" prefHeight="14.0" prefWidth="105.0" text="Delete">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="updateButton" disable="true" layoutX="481.0" layoutY="337.0" mnemonicParsing="false" onAction="#updateClicked" prefHeight="14.0" prefWidth="105.0" text="Update">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Button>
                </children>
             </Pane>
          </content></Tab>
