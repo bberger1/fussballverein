@@ -43,7 +43,7 @@
                   <TextField fx:id="nummerTF" disable="true" layoutX="14.0" layoutY="326.0" prefHeight="27.0" prefWidth="67.0" text="nummer" />
                   <TextField fx:id="bezeichnungTF" disable="true" layoutX="81.0" layoutY="326.0" prefHeight="27.0" prefWidth="314.0" text="bezeichnung" />
                   <TextField fx:id="gewichtTF" disable="true" layoutX="395.0" layoutY="326.0" prefHeight="27.0" prefWidth="68.0" text="gewicht" />
-                  <Button fx:id="deleteButton" layoutX="481.0" layoutY="316.0" mnemonicParsing="false" onAction="#deleteClicked" prefHeight="14.0" prefWidth="105.0" text="Delete">
+                  <Button fx:id="deleteButton" disable="true" layoutX="481.0" layoutY="316.0" mnemonicParsing="false" onAction="#deleteClicked" prefHeight="14.0" prefWidth="105.0" text="Delete">
                      <font>
                         <Font size="10.0" />
                      </font>
