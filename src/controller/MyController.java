@@ -107,6 +107,12 @@ public class MyController implements Initializable {
 	public void updateClicked(ActionEvent event) throws SQLException {
 
 		try {
+			/*String sql = "UPDATE produkt SET bezeichnung=\'" + bezeichnungTF.getText() + "\', gewicht=\'"
+					+ gewichtTF.getText() + "\' WHERE nummer=\'" + inarr[0] + "\'";
+			
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.executeUpdate();*/
+			
 			Statement statement = connection.createStatement();
 
 			// transaction opened
@@ -125,7 +131,7 @@ public class MyController implements Initializable {
 			connection.rollback();
 			System.err.println("Update Error");
 			se.printStackTrace(System.err);
-		} finally {
+  		 } finally {
 			if (statement != null) {
 				// transaction closed
 				statement.close();
@@ -142,19 +148,11 @@ public class MyController implements Initializable {
 
 		try {
 
-			System.out.println("WAAAT");
-
 			// the tabs are accessible, in case of a successful connection
 			// and the progress indicator will be set to "finished"
 			gamerTableTab.setDisable(false);
 			insertTableTab.setDisable(false);
 			progress.setProgress(100);
-
-			// clear all columns in the tableView
-			gamerTableView.getColumns().clear();
-
-			data.clear();
-			data = FXCollections.observableArrayList();
 
 			// this algorithm detects the number of columns
 			for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
@@ -216,6 +214,7 @@ public class MyController implements Initializable {
 		data = FXCollections.observableArrayList();
 
 		// new data is inserted
+//		handleButtonAction(null);
 		getTable();
 
 	}
