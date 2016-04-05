@@ -77,6 +77,7 @@ public class MyController implements Initializable {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 			// method to insert data into the tableView is called
 			getTable();
@@ -158,6 +159,9 @@ public class MyController implements Initializable {
 =======
 			
 >>>>>>> parent of 4f74308... updated JavaDoc & small restructuring
+=======
+			
+>>>>>>> parent of 4f74308... updated JavaDoc & small restructuring
 			// the tabs are accessible, in case of a successful connection
 			// and the progress indicator will be set to "finished"
 			gamerTableTab.setDisable(false);
@@ -166,7 +170,10 @@ public class MyController implements Initializable {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 4f74308... updated JavaDoc & small restructuring
 =======
 >>>>>>> parent of 4f74308... updated JavaDoc & small restructuring
 =======
@@ -282,9 +289,14 @@ public class MyController implements Initializable {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 		// new data is inserted
 //		handleButtonAction(null);
 		getTable();
+=======
+		// new data is inserted 
+		handleButtonAction(null);
+>>>>>>> parent of 4f74308... updated JavaDoc & small restructuring
 =======
 		// new data is inserted 
 		handleButtonAction(null);
