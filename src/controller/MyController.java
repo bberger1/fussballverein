@@ -30,11 +30,11 @@ public class MyController implements Initializable {
 	@FXML
 	private Label label, insertLabel;
 	@FXML
-	private Button loadData, chooseButton, updateButton, disconnect, deleteButton;
+	private Button loadData, chooseButton, updateButton, disconnect, deleteButton, updateTable, insertButton;
 	@FXML
 	private ProgressIndicator progress;
 	@FXML
-	private Tab gamerTableTab, insertTableTab;
+	private Tab outputTableTab, insertTableTab;
 	@SuppressWarnings("rawtypes")
 	@FXML
 	private TableView gamerTableView, updateTableView;
@@ -79,7 +79,7 @@ public class MyController implements Initializable {
 
 			// the tabs are accessible, in case of a successful connection
 			// and the progress indicator will be set to "finished"
-			gamerTableTab.setDisable(false);
+			outputTableTab.setDisable(false);
 			insertTableTab.setDisable(false);
 			progress.setProgress(100);
 
@@ -151,18 +151,34 @@ public class MyController implements Initializable {
 	public void updateClicked(ActionEvent event) throws SQLException {
 
 		try {
-			Statement statement = connection.createStatement();
+			if (gewichtTF.getText().matches("^-?\\d+$") && nummerTF.getText().matches("^-?\\d+$")) {
 
-			// transaction opened
-			connection.setAutoCommit(false);
-			statement.executeUpdate("UPDATE produkt SET bezeichnung=\'" + bezeichnungTF.getText() + "\', gewicht=\'"
-					+ gewichtTF.getText() + "\' WHERE nummer=\'" + inarr[0] + "\'");
-			// transaction committed
-			connection.commit();
+				int num = Integer.parseInt(nummerTF.getText());
+				int gew = Integer.parseInt(gewichtTF.getText());
+				String bez = bezeichnungTF.getText();
 
-			System.out.println("Update successful");
+				String sql = "UPDATE produkt SET bezeichnung=?, gewicht=? WHERE nummer=?";
 
-			updateTableClicked(null);
+				connection.setAutoCommit(false);
+
+				PreparedStatement statement = connection.prepareStatement(sql);
+
+				statement.setString(1, bez);
+				statement.setInt(2, gew);
+				statement.setInt(3, num);
+
+				statement.executeUpdate();
+
+				connection.commit();
+
+				System.out.println("Update successful");
+
+				updateTableClicked(null);
+
+			} else {
+				gewichtTF.setText("Integer!");
+				System.err.println("Enter integer values!");
+			}
 
 		} catch (SQLException se) {
 			// transaction rollback in case of an error with the SQL statement
@@ -214,7 +230,7 @@ public class MyController implements Initializable {
 			connection.close();
 
 			label.setText("not connected");
-			gamerTableTab.setDisable(true);
+			outputTableTab.setDisable(true);
 			insertTableTab.setDisable(true);
 			progress.setProgress(0);
 			loadData.setDisable(false);
@@ -252,19 +268,34 @@ public class MyController implements Initializable {
 	 */
 	@FXML
 	public void insertClicked(ActionEvent event) throws SQLException {
+		
+		// check1 and 2 will check, if the input number fits into an Integer and to avoid errors, the values
+		// are temporarily stored into a larger float variable
+		float check1 = Float.parseFloat(nummerTFI.getText());
+		float check2 = Float.parseFloat(nummerTFI.getText());
 
 		// checks, if the necessary values are numeral (nummer, gewicht)
-		if (nummerTFI.getText().matches("^-?\\d+$") && gewichtTFI.getText().matches("^-?\\d+$")) {
+		if (nummerTFI.getText().matches("^-?\\d+$") && gewichtTFI.getText().matches("^-?\\d+$") && 
+				check1 < 999999999 && check2 < 999999999) {
 
-			int num = Integer.parseInt(nummerTFI.getText());
-			int gew = Integer.parseInt(gewichtTFI.getText());
+			int num = (int) check1;
+			int gew = (int) check2;
 			String bez = bezeichnungTFI.getText();
 
 			try {
+				String sql = "INSERT INTO produkt VALUES (?, ?, ?)";
 
 				// transaction started
 				connection.setAutoCommit(false);
-				statement.executeUpdate("INSERT INTO produkt VALUES (" + num + ", '" + bez + "', '" + gew + "')");
+
+				PreparedStatement statement = connection.prepareStatement(sql);
+
+				statement.setInt(1, num);
+				statement.setString(2, bez);
+				statement.setInt(3, gew);
+
+				statement.executeUpdate();
+
 				// transaction committed
 				connection.commit();
 
@@ -274,6 +305,8 @@ public class MyController implements Initializable {
 				nummerTFI.setText("");
 				gewichtTFI.setText("");
 				bezeichnungTFI.setText("");
+
+				updateTableClicked(null);
 
 			} catch (SQLException e) {
 				// transaction rollback in case of an SQL error
@@ -348,6 +381,12 @@ public class MyController implements Initializable {
 
 		try {
 
+//			Statement stmt = connection.createStatement();
+//			stmt.execute("SET FOREIGN_KEY_CHECKS=0");
+//			stmt.close();
+			
+			connection.setAutoCommit(false);
+
 			String sql = "DELETE FROM produkt WHERE nummer=?";
 
 			PreparedStatement statement = connection.prepareStatement(sql);
@@ -355,21 +394,12 @@ public class MyController implements Initializable {
 			statement.setInt(1, Integer.parseInt(inarr[0]));
 			statement.executeUpdate();
 
-			// connection.setAutoCommit(false);
-
-			// connection.commit();
-
-			/*
-			 * Statement statement = connection.createStatement();
-			 * 
-			 * // transaction opened connection.setAutoCommit(false);
-			 * statement.executeUpdate("DELETE FROM produkt WHERE nummer=\'" +
-			 * inarr[0] + "\'"); // transaction committed connection.commit();
-			 */
+			connection.commit();
 
 			System.out.println("Update successful");
 
 			updateTableClicked(null);
+			
 
 			// disable the update button, to prevent the user to click it, as no
 			// cell is selected
@@ -377,8 +407,9 @@ public class MyController implements Initializable {
 			deleteButton.setDisable(true);
 
 		} catch (SQLException se) {
+			connection.setAutoCommit(false);
 			// transaction rollback in case of an error with the SQL statement
-			// connection.rollback();
+			connection.rollback();
 			System.err.println("Update Error");
 			se.printStackTrace(System.err);
 		} finally {
@@ -387,7 +418,6 @@ public class MyController implements Initializable {
 				statement.close();
 			}
 		}
-
 	}
 
 	/**

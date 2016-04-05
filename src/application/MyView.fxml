@@ -33,7 +33,7 @@
                </children>
             </Pane>
          </content></Tab>
-    <Tab fx:id="gamerTableTab" disable="true" text="Output">
+    <Tab fx:id="outputTableTab" disable="true" text="Output">
          <content>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
