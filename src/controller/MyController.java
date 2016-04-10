@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.ResourceBundle;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.postgresql.util.PSQLException;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
