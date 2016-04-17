@@ -73,8 +73,8 @@ CREATE TABLE Mitglied ( -- df: mult=1999.99
 
 DROP TABLE Spiel;
 CREATE TABLE Spiel ( -- df: mult=1000.0
- datum TIMESTAMP(255) NOT NULL UNIQUE, -- df: text=ts length=1
- bezeichnung VARCHAR(255) NOT NULL PRIMARY KEY, -- df: pattern='Mannschaft-[:count:]'
+ datum TIMESTAMP(255) NOT NULL PRIMARY KEY, -- df: text=ts length=1
+ bezeichnung VARCHAR(255) NOT NULL, -- df: pattern='Mannschaft-[:count:]'
  gegner VARCHAR(255) NOT NULL, -- df: pattern='[a-z]{2,5}'
  ergebnis VARCHAR(255) NOT NULL, -- df: pattern='(Sieg|Niederlage|Unentschieden)'
  FOREIGN KEY (bezeichnung) REFERENCES Mannschaft
@@ -97,9 +97,8 @@ DROP TABLE Beteiligt;
 CREATE TABLE Beteiligt ( -- df: mult=1000.0
  persnr SERIAL NOT NULL PRIMARY KEY REFERENCES Spieler, -- df: offset=10000 size=209999
  datum TIMESTAMP NOT NULL UNIQUE, -- df: text=ts length=1
- bezeichnung VARCHAR(255) NOT NULL, -- df: pattern='Mannschaft-[:count:]'
  dauer INT, -- df: size=90
- FOREIGN KEY (bezeichnung) REFERENCES Spiel
+ FOREIGN KEY (datum) REFERENCES Spiel
 );
 
 --ALTER TABLE beteiligt ADD CONSTRAINT PK_beteiligt PRIMARY KEY (persnr,datum,bezeichnung);
@@ -107,7 +106,7 @@ CREATE TABLE Beteiligt ( -- df: mult=1000.0
 
 DROP TABLE Fanclub;
 CREATE TABLE Fanclub ( -- df: mult=1000.0
- name VARCHAR(255) NOT NULL PRIMARY KEY, -- df: count
+ name VARCHAR(255) NOT NULL PRIMARY KEY, -- df: pattern='Fanclub-[:count:]'
  sid INT NOT NULL,
  gegruendet DATE NOT NULL, -- df: text=dates length=1
  obmann SERIAL NOT NULL, -- df: nogen
@@ -121,7 +120,7 @@ ALTER SEQUENCE Fanclub_obmann_seq RESTART WITH 510000 INCREMENT BY 2;
 DROP TABLE Betreut;
 CREATE TABLE Betreut ( -- df: mult=1000.0
  persnr SERIAL NOT NULL PRIMARY KEY REFERENCES Angestellter, -- df: offset=410000 size=509999
- name VARCHAR(255) NOT NULL UNIQUE, -- df: count
+ name VARCHAR(255) NOT NULL UNIQUE, -- df: pattern='Fanclub-[:count:]'
  anfang DATE NOT NULL, -- df: text=dates length=1
  ende DATE NOT NULL, -- df: text=dates length=1
  FOREIGN KEY (name) REFERENCES Fanclub

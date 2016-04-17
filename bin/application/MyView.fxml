@@ -62,7 +62,7 @@
                   <Button fx:id="updateTable1" layoutX="529.0" layoutY="9.0" mnemonicParsing="false" onAction="#updateTableClicked" text="Update Table" />
                   <TextField fx:id="persnrTF" disable="true" layoutX="15.0" layoutY="330.0" prefHeight="27.0" prefWidth="75.0" text="Persnr" />
                   <TextField fx:id="gehaltTF" disable="true" layoutX="258.0" layoutY="330.0" prefHeight="27.0" prefWidth="97.0" text="Gehalt" />
-                  <Button fx:id="spielerUpdateButton" disable="true" layoutX="571.0" layoutY="330.0" mnemonicParsing="false" onAction="#updateClicked" prefHeight="27.0" prefWidth="59.0" text="Update">
+                  <Button fx:id="spielerUpdateButton" disable="true" layoutX="571.0" layoutY="330.0" mnemonicParsing="false" onAction="#spielerUpdateClicked" prefHeight="27.0" prefWidth="59.0" text="Update">
                      <font>
                         <Font size="12.0" />
                      </font>
@@ -82,7 +82,7 @@
                   <Label layoutX="40.0" layoutY="86.0" prefHeight="17.0" prefWidth="153.0" text="Datum und Uhrzeit:" />
                   <Label layoutX="42.0" layoutY="188.0" prefHeight="17.0" prefWidth="311.0" text="Mannschaft:" />
                   <Label layoutX="336.0" layoutY="86.0" prefHeight="17.0" prefWidth="100.0" text="Gegner:" />
-                  <Button fx:id="insertButton" layoutX="269.0" layoutY="305.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="105.0" text="Einfuegen" />
+                  <Button fx:id="insertButton" layoutX="269.0" layoutY="305.0" mnemonicParsing="false" onAction="#insertButtonClicked" prefHeight="27.0" prefWidth="105.0" text="Einfuegen" />
                   <Label fx:id="insertLabel" alignment="CENTER" layoutX="34.0" layoutY="278.0" prefHeight="17.0" prefWidth="575.0" text="Werte eingeben" />
                   <DatePicker fx:id="datePick" layoutX="41.0" layoutY="110.0" prefHeight="27.0" prefWidth="224.0" promptText="Datum waehlen" />
                   <ComboBox fx:id="ergebnisCB" layoutX="335.0" layoutY="212.0" prefHeight="27.0" prefWidth="224.0" promptText="Ergebnis waehlen..." />
@@ -92,8 +92,8 @@
                      </font>
                   </Label>
                   <Label layoutX="335.0" layoutY="188.0" prefHeight="17.0" prefWidth="100.0" text="Ergebnis:" />
-                  <ComboBox fx:id="gegnerCB" layoutX="336.0" layoutY="111.0" prefHeight="27.0" prefWidth="224.0" promptText="Gegner waehlen..." />
-                  <ComboBox fx:id="mannschaftCB" layoutX="40.0" layoutY="211.0" prefHeight="27.0" prefWidth="224.0" promptText="Mannschaft waehlen..." />
+                  <TextField fx:id="mannschaftTFI" layoutX="42.0" layoutY="212.0" prefHeight="27.0" prefWidth="224.0" />
+                  <TextField fx:id="gegnerTFI" layoutX="335.0" layoutY="110.0" prefHeight="27.0" prefWidth="223.0" />
                </children>
             </Pane>
          </content>

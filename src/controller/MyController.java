@@ -2,7 +2,10 @@ package controller;
 
 import java.net.URL;
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.postgresql.util.PSQLException;
@@ -24,7 +27,9 @@ public class MyController implements Initializable {
 
 	@SuppressWarnings("rawtypes")
 	private ObservableList<ObservableList> data;
+	@SuppressWarnings("rawtypes")
 	private ObservableList<ObservableList> spieler;
+	@SuppressWarnings("rawtypes")
 	private ObservableList<ObservableList> spiel;
 	private PGSimpleDataSource dataSource;
 	private String[] inarr;
@@ -46,14 +51,13 @@ public class MyController implements Initializable {
 	@FXML
 	private TableView gamerTableView, updateTableView, spielerTableView;
 	@FXML
-	private TextField gehaltTF, persnrTF, dbIP, dbName, dbUser, dbPass, timeTF, nummerTF, mannschaftTF, gegnerTF;
+	private TextField gehaltTF, persnrTF, dbIP, dbName, dbUser, dbPass, timeTF, nummerTF, mannschaftTF, gegnerTF, mannschaftTFI, gegnerTFI;
 	@SuppressWarnings("rawtypes")
 	@FXML
-	private ComboBox positionCB, mannschaftCB, gegnerCB, ergebnisCB, standCB;
+	private ComboBox positionCB, ergebnisCB, standCB;
 
 	/**
-	 * handleButtonAction 
-	 * will be executed, when the "connect" button in the
+	 * handleButtonAction will be executed, when the "connect" button in the
 	 * "connect to database" is pressed. It tries to connect to a database by
 	 * using the given parameters. In case they're working, the main select
 	 * statement will be executed
@@ -75,38 +79,40 @@ public class MyController implements Initializable {
 		dataSource.setDatabaseName(dbName.getText());
 		dataSource.setUser(dbUser.getText());
 		dataSource.setPassword(dbPass.getText());
-		
+
 		// building up the connection to the database
 		try {
 			connection = dataSource.getConnection();
-			// prepare statement and execute it
-			
-			
+
 			System.out.println("successfully connected!");
-			
+
+			// save needed options for the comboboxes in a ObservableList, which
+			// can be inserted into the ComboBoxes
 			ObservableList<String> stand = FXCollections.observableArrayList("Sieg", "Unentschieden", "Niederlage");
-			
+
 			ergebnisCB.setItems(stand);
 			standCB.setItems(stand);
-			
-			ObservableList<String> position = FXCollections.observableArrayList("torwart", "innenverteidiger", "aussenverteidiger", "defensiver mittelfeldspieler",
-					"offensiver mittelfeldspieler", "fluegelspieler", "stuermer");
-			
+
+			ObservableList<String> position = FXCollections.observableArrayList("torwart", "innenverteidiger",
+					"aussenverteidiger", "defensiver mittelfeldspieler", "offensiver mittelfeldspieler",
+					"fluegelspieler", "stuermer");
+
 			positionCB.setItems(position);
-			
+
+			// the static tableViews are saved in an seperate attribute, so it
+			// has not to be created, with every clickOnTable action
 			spiel = getTable("SELECT * FROM spiel", gamerTableView);
 			spieler = getTable("SELECT * FROM spieler", spielerTableView);
-			
-			mannschaftCB.setItems(getTable("SELECT bezeichnung FROM mannschaft",gamerTableView));
-			gegnerCB.setItems(getTable("SELECT gegner FROM spiel", gamerTableView));
-			
-			gamerTableView.setItems(getTable("select * from spiel",gamerTableView));
-			spielerTableView.setItems(getTable("select * from spieler",spielerTableView));
+
+			// put the gotten data into the tableViews
+			gamerTableView.setItems(getTable("select * from spiel", gamerTableView));
+			spielerTableView.setItems(getTable("select * from spieler", spielerTableView));
+
 			updateTableClicked(null);
 			connection.commit();
-			
+
 			label.setText("Verbunden!");
-			
+
 			// error handling with error messages
 		} catch (PSQLException e) {
 			System.err.println("PSQL Error");
@@ -120,19 +126,18 @@ public class MyController implements Initializable {
 	}
 
 	/**
-	 * getTable 
-	 * adds all needed data to the tableView if executed
-	 * @throws SQLException 
+	 * getTable adds all needed data to the tableView if executed
+	 * 
+	 * @throws SQLException
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ObservableList<ObservableList> getTable(String statement, TableView tableView) throws SQLException {
-		
-		ObservableList<ObservableList> table = FXCollections.observableArrayList();
-		
-		try {
 
+		ObservableList<ObservableList> table = FXCollections.observableArrayList();
+
+		try {
 			connection = dataSource.getConnection();
-			// Abfrage vorbereiten und ausführen
+			// prepare statement and execute it
 			Statement st = connection.createStatement();
 			connection.setAutoCommit(false);
 			ResultSet rs = st.executeQuery(statement);
@@ -155,7 +160,7 @@ public class MyController implements Initializable {
 
 			}
 
-			// Ergebnisse verarbeiten
+			// process results
 			while (rs.next()) { // Cursor bewegen
 				ObservableList<String> row = FXCollections.observableArrayList();
 				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
@@ -166,13 +171,12 @@ public class MyController implements Initializable {
 
 				table.add(row);
 			}
-			
+
 			// after the successful connection construction, the connect button
 			// will (logically) disabled
 			// and the disconnect button enabled
 			loadData.setDisable(true);
 			disconnect.setDisable(false);
-			
 
 		} catch (PSQLException se) {
 			connection.rollback();
@@ -185,11 +189,9 @@ public class MyController implements Initializable {
 		}
 		return table;
 	}
-	
 
 	/**
-	 * updateClicked 
-	 * will be executed, if the "update" button for the row update
+	 * updateClicked will be executed, if the "update" button for the row update
 	 * is pressed. It takes the given parameters and puts them into a SQL
 	 * statement, which is protected by a transaction.
 	 * 
@@ -202,12 +204,15 @@ public class MyController implements Initializable {
 	public void updateClicked(ActionEvent event) throws SQLException {
 
 		try {
+			// get all the data from the textfields and combobox to insert it
+			// into the prepared statement
 			String num = nummerTF.getText();
 			String gew = gegnerTF.getText();
 			String bez = mannschaftTF.getText();
 			String stand = (String) standCB.getValue();
 
-			String sql = "UPDATE spiel SET datum='"+num+"', bezeichnung=?, gegner=?, ergebnis=? WHERE datum='"+num+"'";
+			String sql = "UPDATE spiel SET datum='" + num + "', bezeichnung=?, gegner=?, ergebnis=? WHERE datum='" + num
+					+ "'";
 
 			connection.setAutoCommit(false);
 
@@ -216,14 +221,12 @@ public class MyController implements Initializable {
 			statement.setString(1, bez);
 			statement.setString(2, gew);
 			statement.setString(3, stand);
-			
-			System.err.println(statement);
-			
+
 			statement.executeUpdate();
 
 			connection.commit();
 
-			System.out.println("Update erfolgreich");
+			System.out.println("Update successful");
 
 			updateTableClicked(null);
 
@@ -234,21 +237,78 @@ public class MyController implements Initializable {
 			se.printStackTrace(System.err);
 		}
 	}
+	
+	/**
+	 * updateClicked will be executed, if the "update" button for the row update
+	 * is pressed. It takes the given parameters and puts them into a SQL
+	 * statement, which is protected by a transaction.
+	 * 
+	 * @param event
+	 *            ActionEvent generated by the click event
+	 * @throws SQLException
+	 *             could throw a SQLException, caused by the rollback() method
+	 */
+	@FXML
+	public void spielerUpdateClicked(ActionEvent event) throws SQLException {
+
+		try {
+			if(gehaltTF.getText().matches("-?\\d+(\\.\\d+)?")){
+				
+				// get all the data from the textfields and combobox to insert it
+				// into the prepared statement
+				String persnr = persnrTF.getText();
+				String pos = (String) positionCB.getValue();
+				int gehalt = Integer.parseInt(gehaltTF.getText());
+				String von = vonDate.getValue().toString();
+				String bis = bisDate.getValue().toString();
+				System.out.println(von);
+	
+				String sql = "UPDATE spieler SET persnr='" + persnr + "', position=?, gehalt=?, von='"+von+"', bis='"+bis+"' WHERE persnr='" + persnr
+						+ "'";
+	
+				connection.setAutoCommit(false);
+	
+				PreparedStatement statement = connection.prepareStatement(sql);
+	
+				statement.setString(1, pos);
+				statement.setInt(2, gehalt);
+	
+				statement.executeUpdate();
+	
+				connection.commit();
+	
+				System.out.println("Update successful");
+	
+				updateTableClicked(null);
+			} else {
+				System.err.println("enter numeric \"gehalt\"");
+			}
+
+		} catch (SQLException se) {
+			// transaction rollback in case of an error with the SQL statement
+			connection.rollback();
+			System.err.println("Update Error");
+			se.printStackTrace(System.err);
+		}
+	}
 
 	/**
-	 * updateTableClicked 
-	 * will be executed, when the upper "update" button for
+	 * updateTableClicked will be executed, when the upper "update" button for
 	 * the tableView is pressed. Clears the whole tableView to add the latest
 	 * data.
 	 * 
 	 * @param event
 	 *            ActionEvent generated by the click event
+	 * @throws SQLException 
 	 */
 	@SuppressWarnings("unchecked")
 	@FXML
-	public void updateTableClicked(ActionEvent event) {
+	public void updateTableClicked(ActionEvent event) throws SQLException {
 
-		// clear all columns in the tableView
+		spiel = getTable("SELECT * FROM spiel", gamerTableView);
+		spieler = getTable("SELECT * FROM spieler", spielerTableView);
+		
+		// clear all columns in the tableView to avoid duplication to columns
 		gamerTableView.getColumns().clear();
 		spielerTableView.getColumns().clear();
 
@@ -257,10 +317,10 @@ public class MyController implements Initializable {
 
 		// new data is inserted
 		try {
-			gamerTableView.setItems(getTable("select * from spiel",gamerTableView));
+			gamerTableView.setItems(getTable("select * from spiel", gamerTableView));
 			data.clear();
 			data = FXCollections.observableArrayList();
-			spielerTableView.setItems(getTable("select * from spieler",spielerTableView));
+			spielerTableView.setItems(getTable("select * from spieler", spielerTableView));
 		} catch (SQLException e) {
 			System.err.println("ERROR occured");
 		}
@@ -296,7 +356,7 @@ public class MyController implements Initializable {
 			updateButton.setDisable(true);
 
 			System.out.println("Verbindung getrennt");
-			
+
 			// clear all columns in the tableView
 			gamerTableView.getColumns().clear();
 
@@ -311,7 +371,6 @@ public class MyController implements Initializable {
 
 	}
 
-	
 	/**
 	 * insertClicked 
 	 * checks if the given input for the insert is valid. In this
@@ -322,72 +381,48 @@ public class MyController implements Initializable {
 	 * @throws SQLException
 	 *             could throw a SQLException, caused by the rollback() method
 	 */
-	/**@FXML
-	public void insertClicked(ActionEvent event) throws SQLException {
+	@FXML
+	public void insertButtonClicked(ActionEvent event) throws SQLException {
 
-		// check1 and 2 will check, if the input number fits into an Integer and
-		// to avoid errors, the values
-		// are temporarily stored into a larger float variable
-		float check1 = Float.parseFloat(nummerTFI.getText());
-		float check2 = Float.parseFloat(nummerTFI.getText());
+		try {
+			
+			Statement st = connection.createStatement();
+			connection.setAutoCommit(false);
 
-		// checks, if the necessary values are numeral (nummer, gewicht)
-		if (nummerTFI.getText().matches("^-?\\d+$") && gewichtTFI.getText().matches("^-?\\d+$") && check1 < 999999999
-				&& check2 < 999999999) {
+			String gegner = gegnerTFI.getText();
+			String mannschaft = mannschaftTFI.getText();
+			String timestamp = datePick.getValue() + " " + timeTF.getText();
 
-			int num = (int) check1;
-			int gew = (int) check2;
-			String bez = bezeichnungTFI.getText();
+			String sql = "INSERT INTO spiel VALUES('" + timestamp + "', ?, ?, ?)";
 
-			try {
-				String sql = "INSERT INTO produkt VALUES (?, ?, ?)";
+			connection.setAutoCommit(false);
 
-				// transaction started
-				connection.setAutoCommit(false);
+			PreparedStatement statement = connection.prepareStatement(sql);
 
-				PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, mannschaft);
+			statement.setString(2, gegner);
+			statement.setString(3, (String) ergebnisCB.getValue());
 
-				statement.setInt(1, num);
-				statement.setString(2, bez);
-				statement.setInt(3, gew);
+			statement.executeUpdate();
 
-				statement.executeUpdate();
-
-				// transaction committed
-				connection.commit();
-
-				System.out.println("Insert successful!");
-				insertLabel.setText("Insert successful");
-
-				nummerTFI.setText("");
-				gewichtTFI.setText("");
-				bezeichnungTFI.setText("");
-
-				updateTableClicked(null);
-
-			} catch (SQLException e) {
-				// transaction rollback in case of an SQL error
-				connection.rollback();
-				insertLabel.setText("Insert error!");
-				System.err.println("Insert error!");
-				e.printStackTrace();
-
-			}
-
-		} else {
-			insertLabel.setText("ERROR: check your input! nummer and gewicht have to be integer!");
-			System.err.print("ERROR: check your input! nummer and gewicht have to be integer!");
+			connection.commit();
+			
+		} catch (SQLException se) {
+			connection.rollback();
+			System.err.println("Update - Error");
+			insertLabel.setText("SQL Error! Kontrolliere deine Eingabe");
+			se.printStackTrace(System.err);
 		}
-	}*/
+
+	}
 
 	/**
-	 * onMouseClicked 
-	 * will be executed, if the user clicks inside the tableView
+	 * onMouseClicked will be executed, if the user clicks inside the tableView
 	 * on a cell. This method reads the data, which is inside the clicked row.
 	 * 
 	 * @param event
 	 *            MouseEvent generated by the mouse event
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	@SuppressWarnings("unchecked")
 	@FXML
@@ -422,15 +457,38 @@ public class MyController implements Initializable {
 		gegnerTF.setDisable(false);
 
 	}
-	
+
 	/**
-	 * onMouseClicked 
-	 * will be executed, if the user clicks inside the tableView
+	 * changeDateFormat
+	 * method to change the format of a given date, from american format or the opposite
+	 * @param date
+	 * @param america
+	 * @return
+	 */
+	public String changeDateFormat(String date, boolean america) {
+
+		if (!america) {
+			// split the string up at "."
+			String[] arr;
+			arr = date.split(".");
+			// return the well formed date
+			return arr[2] + "-" + arr[1] + "-" + arr[0];
+		} else {
+			// split the string up at "-"
+			String[] arr;
+			arr = date.split("-");
+			// return the well formed date
+			return arr[2] + "." + arr[1] + "." + arr[0];
+		}
+	}
+
+	/**
+	 * onMouseClicked will be executed, if the user clicks inside the tableView
 	 * on a cell. This method reads the data, which is inside the clicked row.
 	 * 
 	 * @param event
 	 *            MouseEvent generated by the mouse event
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	@SuppressWarnings("unchecked")
 	@FXML
@@ -440,7 +498,7 @@ public class MyController implements Initializable {
 		@SuppressWarnings("rawtypes")
 		TablePosition focusedCell = spielerTableView.getFocusModel().getFocusedCell();
 		int row = focusedCell.getRow();
-	
+
 		// get the data of this row
 		String input = spieler.get(row) + "";
 
@@ -458,6 +516,13 @@ public class MyController implements Initializable {
 		persnrTF.setText(inarr[0]);
 		positionCB.setValue(inarr[1]);
 		gehaltTF.setText(inarr[2]);
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate date = LocalDate.parse(inarr[3], formatter);
+		vonDate.setValue(date);
+		
+		date = LocalDate.parse(inarr[4], formatter);
+		bisDate.setValue(date);
 
 		positionCB.setDisable(false);
 		gehaltTF.setDisable(false);
@@ -467,8 +532,7 @@ public class MyController implements Initializable {
 	}
 
 	/**
-	 * deleteClicked 
-	 * this method will be executed, when the delete button is
+	 * deleteClicked this method will be executed, when the delete button is
 	 * pressed in the output tab. It will execute a delete SQL statment which
 	 * deletes the selected row.
 	 * 
